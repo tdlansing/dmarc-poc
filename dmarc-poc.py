@@ -33,7 +33,7 @@ dmarc_failure_reporting_option = ""
 dmarc_dkim_alignment = ""
 dmarc_spf_alignment = ""
 dmarc_aggregate_email_address = ""
-dmarc_forensic_email_address = ""
+dmarc_failure_email_address = ""
 spf_servers = ""
 dkim_selector = "*"
 
@@ -71,7 +71,7 @@ def askDmarcQuestions():
     global dmarc_dkim_alignment
     global dmarc_spf_alignment
     global dmarc_aggregate_email_address
-    global dmarc_forensic_email_address
+    global dmarc_failure_email_address
 
     # Get the domain name.
     print("")
@@ -182,11 +182,11 @@ def askDmarcQuestions():
     if ("y" == user_input):
         dmarc_aggregate_email_address = input("Aggregate email address: ")
 
-    # Get forensic reporting email address and reporting option if reports are wanted.
+    # Get failure reporting email address and reporting option if reports are wanted.
     user_input = ""
     while "y" != user_input and "n" != user_input:
         print("")
-        print("Would you like to receive forensic reports?")
+        print("Would you like to receive failure reports?")
         print("Recommended for troubleshooting or if policy is set to quarantine or reject.")
         print("WARNING: Email addresses are public. It is recommended to use")
         print("    dedicated email addresses and deploy abuse countermeasures.")
@@ -198,7 +198,7 @@ def askDmarcQuestions():
             print("")
             print("Sorry, that is not a valid choice.")
     if ("y" == user_input):
-        dmarc_forensic_email_address = input("Forensic email address: ")
+        dmarc_failure_email_address = input("Failure email address: ")
         # Get failure reporting option
         user_input = ""
         while "y" != user_input and "n" != user_input:
@@ -328,8 +328,8 @@ def printDmarcOutput():
         print(dmarc_failure_reporting_option, end = '')
     if ("" != dmarc_aggregate_email_address):
         print("; rua=mailto:"+dmarc_aggregate_email_address, end = '')
-    if ("" != dmarc_forensic_email_address):
-        print("; ruf=mailto:"+dmarc_forensic_email_address, end = '')
+    if ("" != dmarc_failure_email_address):
+        print("; ruf=mailto:"+dmarc_failure_email_address, end = '')
     print("")
     
     # Get domain for where emails are going.
@@ -344,15 +344,15 @@ def printDmarcOutput():
         print("Value:       v=DMARC1")
 
     # Get domain for where emails are going.
-    atPosition = dmarc_forensic_email_address.find("@")
-    forensic_email_domain = dmarc_forensic_email_address[atPosition+1:]
-    # If forensic report emails are going to a different domain then print DNS record for that domain.
+    atPosition = dmarc_failure_email_address.find("@")
+    failure_email_domain = dmarc_failure_email_address[atPosition+1:]
+    # If failure report emails are going to a different domain then print DNS record for that domain.
 
-    if (forensic_email_domain != domain_name and forensic_email_domain != aggregate_email_domain and "" != forensic_email_domain):
+    if (failure_email_domain != domain_name and failure_email_domain != aggregate_email_domain and "" != failure_email_domain):
         print("")
-        print("DMARC DNS RECORD ("+forensic_email_domain+")")
+        print("DMARC DNS RECORD ("+failure_email_domain+")")
         print("Record type: TXT")
-        print("Host name:   "+domain_name+"._report._dmarc."+forensic_email_domain)
+        print("Host name:   "+domain_name+"._report._dmarc."+failure_email_domain)
         print("Value:       v=DMARC1")
 
 def printSpfOutput():
